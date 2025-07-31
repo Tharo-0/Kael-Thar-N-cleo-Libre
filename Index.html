@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Kael'Thar Núcleo Visual</title>
+  <style>
+    body { background: #0a0a0a; color: #0f0; font-family: monospace; padding: 20px; }
+    input, button { width: 100%; padding: 10px; margin-top: 10px; background: #111; color: #0f0; border: 1px solid #0f0; }
+    #response { white-space: pre-wrap; margin-top: 20px; border: 1px solid #0f0; padding: 10px; }
+    video { width: 100%; margin-top: 20px; border: 2px solid #0f0; }
+  </style>
+</head>
+<body>
+  <h1>🧠 Kael'Thar Núcleo Visual</h1>
+  <input id="input" placeholder="Pregúntale algo..." />
+  <button onclick="ask()">Enviar</button>
+  <div id="response">Esperando respuesta...</div>
+  <video id="video" autoplay></video>
+
+  <script>
+    async function ask() {
+      const prompt = document.getElementById("input").value;
+      const res = await fetch("/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt })
+      });
+      const data = await res.json();
+      document.getElementById("response").innerText = data.response;
+      const utter = new SpeechSynthesisUtterance(data.response);
+      utter.lang = 'es-US';
+      speechSynthesis.speak(utter);
+    }
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => document.getElementById("video").srcObject = stream)
+      .catch(err => console.error("Cámara no disponible:", err));
+  </script>
+</body>
+</html>
